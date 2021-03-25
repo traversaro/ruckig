@@ -76,6 +76,19 @@ if(BUILD_PYTHON_MODULE)
   pybind11_add_module(_ruckig src/python.cpp)
   target_compile_features(_ruckig PUBLIC cxx_std_17)
   target_link_libraries(_ruckig PUBLIC ruckig)
+  
+  find_package(Python3 COMPONENTS Interpreter REQUIRED)
+  option(RUCKIG_PYTHON_INSTALL_IN_ACTIVE_SITE "If ON, by default install Python bindings in the active site package directory and ignore RUCKIG_PYTHON_INSTALL_DIR" OFF)
+  execute_process(COMMAND ${Python3_EXECUTABLE}
+     -c "from distutils import sysconfig; print(sysconfig.get_python_lib(1,0,prefix=''))"
+     OUTPUT_VARIABLE RUCKIG_PYTHON_INSTALL_DIR_DEFAULT
+     OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(RUCKIG_PYTHON_INSTALL_DIR ${RUCKIG_PYTHON_INSTALL_DIR_DEFAULT} CACHE PATH "Installation directory for ruckig Python bindings.")
+  if(RUCKIG_PYTHON_INSTALL_IN_ACTIVE_SITELIB)
+    set(RUCKIG_PYTHON_INSTALL_DIR_ACTUALLY_USED ${Python3_SITEARCH})
+  else()
+    set(RUCKIG_PYTHON_INSTALL_DIR_ACTUALLY_USED ${RUCKIG_PYTHON_INSTALL_DIR})
+  endif()
 endif()
 
 
